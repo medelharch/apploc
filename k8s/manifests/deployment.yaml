@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: location-app
-        image: med3301/location-app:latest
+        image: medelharch/location-app:latest
         ports:
         - containerPort: 8081
