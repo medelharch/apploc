@@ -7,7 +7,8 @@ pipeline {
         DOCKER_USER = "medelharch"
         DOCKER_PASS = "dockerhub-pass"
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"   
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+	HELM_VALUES_FILE = 'helm/location-app-chart/values.yaml'
     }
 
     stages {
@@ -74,6 +75,35 @@ pipeline {
                         docker_image.push("${IMAGE_TAG}")
 			docker_image.push('latest')
                     }
+                }
+            }
+        }
+
+	stage('Update tag in Helm Chart') {
+            steps {
+                script {
+                    // Update the Docker image tag in the Helm chart's values.yaml file
+                    sh """
+		    sed -i 's/tag: .*/tag: "${IMAGE_TAG}"/' ${HELM_VALUES_FILE}
+		    """
+                }
+            }
+        }
+
+        stage('Commit and Push Changes') {
+            steps {
+                script {
+		     withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+                    	// Commit the changes to values.yaml and push to the Git repository
+                    	sh """
+                    	git config --global user.email "med.lhrach2@gmail.com"
+		    	git config --global user.name "Mohamed EL HARCH"
+                    	git add ${HELM_VALUES_FILE}
+                    	git commit -m "Update tag in Helm chart to ${IMAGE_TAG}"
+		    	git remote set-url origin https://$GITHUB_USER:$GITHUB_TOKEN@github.com/medelharch/apploc.git
+                    	git push origin HEAD:main
+                    	"""
+		     }
                 }
             }
         }
