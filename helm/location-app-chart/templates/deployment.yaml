@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: location-app
-        image: medelharch/location-app:{{ .values.image.tag }}
+        image: medelharch/location-app:{{ .Values.image.tag }}
         ports:
         - containerPort: 8081
