@@ -5,7 +5,7 @@ metadata:
   labels:
     app: location-app
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: location-app
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: location-app
-        image: med3301/location-app:{{ .Values.image.tag }}
+        image: medelharch/location-app:latest
         ports:
         - containerPort: 8081
